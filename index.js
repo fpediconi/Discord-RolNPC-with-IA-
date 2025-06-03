@@ -4,6 +4,7 @@ const {
   TARGET_CHANNEL_ID,
 } = require('./config');
 
+const express = require('express');
 const memoryManager = require('./memoryManager');
 const conversationManager = require('./conversationManager');
 const filter = require('./filter');
@@ -12,6 +13,11 @@ const iaClient = require('./iaClient');
 
 const mensajeBuffer = {};
 const AGRUPACION_DELAY_MS = 3000;
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => res.send('Vigo está despierto.'));
+app.listen(PORT, () => console.log(`Servidor web falso activo en puerto ${PORT}`));
 
 const client = new Client({
   intents: [
