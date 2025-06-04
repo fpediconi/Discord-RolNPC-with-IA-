@@ -1,11 +1,10 @@
 const { Client, GatewayIntentBits } = require('discord.js'); 
-const {
-  DISCORD_TOKEN,
-  TARGET_CHANNEL_ID,
-} = require('./config');
+const Config = require('./config');
+const config = new Config();
 
 const express = require('express');
 const memoryManager = require('./memoryManager');
+memoryManager.cargarMemoria(config);
 const conversationManager = require('./conversationManager');
 const filter = require('./filter');
 const promptBuilder = require('./promptBuilder');
@@ -16,7 +15,7 @@ const AGRUPACION_DELAY_MS = 3000;
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => res.send('Vigo está despierto.'));
+app.get('/', (req, res) => res.send(proces`${process.env.PERSONALITY_NAME} está despierto.`));
 app.listen(PORT, () => console.log(`Servidor web falso activo en puerto ${PORT}`));
 
 const client = new Client({
@@ -32,50 +31,53 @@ client.conversationHistories = conversationManager.conversationHistories || new 
 client.on('messageCreate', async (message) => {
   // Incorporar en el mensaje el nombre del usuario
   message.content = `${message.author.username} dice: ${message.content}`;
-  if (message.channel.id !== TARGET_CHANNEL_ID) return;
-  if (!filter.esMensajeValidoParaResponder(message, conversationManager)) return;
+  if (process.env.DEBUG === 'true') console.log(`Mensaje recibido en canal ${message.channel.id} de ${message.author.username}: ${message.content}`);
+  if (filter.esMensajeValidoParaResponder(message, conversationManager, config)) {
+    const canalId = message.channel.id;
+    const user = message.author;
+    const content = message.content.trim();
+    if (content) {
+      // Mostrar que está escribiendo
+      try {
+        await message.channel.sendTyping();
+      } catch (e) {
+        console.warn('No se pudo enviar typing:', e);
+      }
 
-  const canalId = message.channel.id;
-  const user = message.author;
-  const content = message.content.trim();
-  if (!content) return;
+      if (!mensajeBuffer[canalId]) {
+        mensajeBuffer[canalId] = {
+          usuarioActual: user,
+          mensajes: [content],
+          timeout: setTimeout(() => {
+            procesarMensajesAgrupados(canalId);
+          }, AGRUPACION_DELAY_MS)
+        };
+      } else {
+        const buffer = mensajeBuffer[canalId];
 
-  // Mostrar que Vigo está escribiendo
-  try {
-    await message.channel.sendTyping();
-  } catch (e) {
-    console.warn('No se pudo enviar typing:', e);
-  }
+        if (buffer.usuarioActual !== user) {
+          clearTimeout(buffer.timeout);
+          await procesarMensajesAgrupados(canalId);
 
-  if (!mensajeBuffer[canalId]) {
-    mensajeBuffer[canalId] = {
-      usuarioActual: user,
-      mensajes: [content],
-      timeout: setTimeout(() => {
-        procesarMensajesAgrupados(canalId);
-      }, AGRUPACION_DELAY_MS)
-    };
-  } else {
-    const buffer = mensajeBuffer[canalId];
-
-    if (buffer.usuarioActual !== user) {
-      clearTimeout(buffer.timeout);
-      await procesarMensajesAgrupados(canalId);
-
-      mensajeBuffer[canalId] = {
-        usuarioActual: user,
-        mensajes: [content],
-        timeout: setTimeout(() => {
-          procesarMensajesAgrupados(canalId);
-        }, AGRUPACION_DELAY_MS)
-      };
-    } else {
-      buffer.mensajes.push(content);
-      clearTimeout(buffer.timeout);
-      buffer.timeout = setTimeout(() => {
-        procesarMensajesAgrupados(canalId);
-      }, AGRUPACION_DELAY_MS);
+          mensajeBuffer[canalId] = {
+            usuarioActual: user,
+            mensajes: [content],
+            timeout: setTimeout(() => {
+              procesarMensajesAgrupados(canalId);
+            }, AGRUPACION_DELAY_MS)
+          };
+        } else {
+          buffer.mensajes.push(content);
+          clearTimeout(buffer.timeout);
+          buffer.timeout = setTimeout(() => {
+            procesarMensajesAgrupados(canalId);
+          }, AGRUPACION_DELAY_MS);
+        }
+      }
     }
+    
+  }else {
+    if (process.env.DEBUG === 'true') console.log(`Mensaje ignorado en canal ${message.channel.id} de ${message.author.username}: ${message.content}`); 
   }
 });
 
@@ -87,13 +89,14 @@ async function procesarMensajesAgrupados(canalId) {
   const mensajesAgrupados = buffer.mensajes.join('\n');
   delete mensajeBuffer[canalId];
 
-  memoryManager.actualizarMemoriaUsuario(canalId, user, mensajesAgrupados);
-  conversationManager.agregarMensajeHistorial(canalId, user, 'user', mensajesAgrupados);
+  memoryManager.actualizarMemoriaUsuario(canalId, user, mensajesAgrupados, config);
+  conversationManager.agregarMensajeHistorial(canalId, user, 'user', mensajesAgrupados, config);
 
   const systemPrompt = promptBuilder.construirPromptSystem(
     canalId,
     conversationManager.conversationHistories,
-    memoryManager.memoryData
+    memoryManager.memoryData,
+    config
   );
 
   const contextoGrupo = conversationManager.obtenerContextoParaCanal(canalId);
@@ -104,8 +107,8 @@ async function procesarMensajesAgrupados(canalId) {
     if (canal?.sendTyping) canal.sendTyping();
 
     if (process.env.DEBUG === 'true') console.log('Enviando consulta a IA con mensajes agrupados:', messages);
-    const respuesta = await iaClient.procesarConsultaIA(messages);
-    conversationManager.agregarMensajeHistorial(canalId, user, 'assistant', respuesta);
+    const respuesta = await iaClient.procesarConsultaIA(messages, config);
+    conversationManager.agregarMensajeHistorial(canalId, user, 'assistant', respuesta, config);
 
     await canal.send(respuesta);
   } catch (e) {
@@ -115,6 +118,7 @@ async function procesarMensajesAgrupados(canalId) {
 
 client.once('ready', () => {
   console.log(`Bot listo! Conectado como ${client.user.tag}`);
+  config.cargar();
 });
 
-client.login(DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN);

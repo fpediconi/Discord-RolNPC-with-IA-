@@ -1,29 +1,27 @@
 const axios = require('axios');
-const { MAX_CONCURRENT_QUERIES, USE_LOCAL_API } = require('./config');
 
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
-const MODEL_NAME = 'llama3'; 
-const OPENROUTER_API_KEY = process.env.OPEN_ROUTE_API_KEY;
+const MODEL_NAME = 'llama3';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = 'openai/gpt-3.5-turbo'; 
+const OPENROUTER_MODEL = 'openai/gpt-3.5-turbo';
 
 let consultasEnProceso = 0;
 const colaConsultas = [];
 
-async function procesarConsultaIA(messages) {
-  if (USE_LOCAL_API) {
-    return procesarConsultaIAInt(messages);
-  }else {
-    return procesarConsultaIAExt(messages);
+// Función pública: selecciona si usar IA local o externa
+async function procesarConsultaIA(messages, config) {
+  if (config.USE_LOCAL_API) {
+    return procesarConsultaIAInt(messages, config);
+  } else {
+    return procesarConsultaIAExt(messages, config);
   }
 }
 
-async function procesarConsultaIAInt(messages) {
+async function procesarConsultaIAInt(messages, config) {
   return new Promise((resolve) => {
     const ejecutar = async () => {
       consultasEnProceso++;
       try {
-        
         const prompt = messages
           .map(m => `${m.role === 'user' ? 'User' : m.role === 'assistant' ? 'Assistant' : 'System'}: ${m.content}`)
           .join('\n') + '\nAssistant:';
@@ -36,7 +34,7 @@ async function procesarConsultaIAInt(messages) {
             stream: false,
           },
           {
-            timeout: 60000, // 60s timeout
+            timeout: 60000,
           }
         );
 
@@ -47,14 +45,11 @@ async function procesarConsultaIAInt(messages) {
         resolve('Perdón, tuve un problema para responder.');
       } finally {
         consultasEnProceso--;
-        if (colaConsultas.length > 0) {
-          const siguiente = colaConsultas.shift();
-          siguiente();
-        }
+        if (colaConsultas.length > 0) colaConsultas.shift()();
       }
     };
 
-    if (consultasEnProceso < MAX_CONCURRENT_QUERIES) {
+    if (consultasEnProceso < config.MAX_CONCURRENT_QUERIES) {
       ejecutar();
     } else {
       colaConsultas.push(ejecutar);
@@ -62,7 +57,9 @@ async function procesarConsultaIAInt(messages) {
   });
 }
 
-async function procesarConsultaIAExt(messages) {
+async function procesarConsultaIAExt(messages, config) {
+  console.log('Api de open router: ', config.OPENROUTER_API_KEY, ' registrada');
+  
   return new Promise((resolve) => {
     const ejecutar = async () => {
       consultasEnProceso++;
@@ -77,7 +74,7 @@ async function procesarConsultaIAExt(messages) {
           },
           {
             headers: {
-              'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+              'Authorization': `Bearer ${config.OPENROUTER_API_KEY}`,
               'Content-Type': 'application/json',
             },
             timeout: 60000,
@@ -91,14 +88,11 @@ async function procesarConsultaIAExt(messages) {
         resolve('Perdón, tuve un problema para responder.');
       } finally {
         consultasEnProceso--;
-        if (colaConsultas.length > 0) {
-          const siguiente = colaConsultas.shift();
-          siguiente();
-        }
+        if (colaConsultas.length > 0) colaConsultas.shift()();
       }
     };
 
-    if (consultasEnProceso < MAX_CONCURRENT_QUERIES) {
+    if (consultasEnProceso < config.MAX_CONCURRENT_QUERIES) {
       ejecutar();
     } else {
       colaConsultas.push(ejecutar);

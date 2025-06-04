@@ -1,5 +1,3 @@
-const { TARGET_CHANNEL_ID, IGNORAR_COOLDOWN_CHANNELS = [] } = require('./config');
-
 function hayDialogoRecienteConUsuario(message, historial) {
   const now = Date.now();
   const mensajesRecientes = historial.slice(-6).reverse();
@@ -15,18 +13,18 @@ function hayDialogoRecienteConUsuario(message, historial) {
     const esBot = anterior.role === 'assistant';
     if (process.env.DEBUG === 'true') console.log(`[DEBUG] Revisando mensaje: ${actual.content} (Usuario: ${esUsuario}, Bot: ${esBot})`);
     
-    if (esUsuario && esBot && now - anterior.timestamp < 1000 * 60 * 2) {
+    if (esUsuario && esBot && now - anterior.timestamp < 1000 * 15) {
       return true;
     }
   }
   return false;
 }
 
-function esMensajeValidoParaResponder(message, conversationManager) {
+function esMensajeValidoParaResponder(message, conversationManager, config) {
   if (message.author.bot) return false;
 
   const channelId = message.channel.id;
-  if (channelId !== TARGET_CHANNEL_ID && !IGNORAR_COOLDOWN_CHANNELS.includes(channelId)) return false;
+  if (channelId !== config.TARGET_CHANNEL_ID && !config.IGNORAR_COOLDOWN_CHANNELS.includes(channelId)) return false;
 
   const texto = message.content.toLowerCase().trim();
   if (!texto || texto.length < 3) return false;
@@ -36,13 +34,13 @@ function esMensajeValidoParaResponder(message, conversationManager) {
 
   if (process.env.DEBUG === 'true') console.log(`[DEBUG] Mensaje de ${message.author.username}: "${texto}"`);
 
-  const palabrasClave = ['vigo', 'nix', 'pesca', 'caña', 'pescador', 'pescadora', 'pesca deportiva', 'pesca con caña', 'pesca en vigo'];
+  const palabrasClave = [process.env.PERSONALITY_NAME, 'ayuda', 'info', 'hola', 'adiós', 'gracias', 'por favor'];
   const mencionaBot = message.mentions.has(message.client.user);
   const contienePalabraClave = palabrasClave.some(p => texto.includes(p));
 
   const historial = conversationManager.conversationHistories.get(channelId) || [];
   if (process.env.DEBUG === 'true') console.log(`[DEBUG] Canal: ${channelId}, Historial: ${historial.length} mensajes`);
-  const canalIgnoraCooldown = IGNORAR_COOLDOWN_CHANNELS.includes(channelId);
+  const canalIgnoraCooldown = config.IGNORAR_COOLDOWN_CHANNELS.includes(channelId);
   const dialogoEnCurso = hayDialogoRecienteConUsuario(message, historial);
   if (process.env.DEBUG === 'true') console.log(`[DEBUG] Canal: Dialogo en curso: ${dialogoEnCurso}`);
 

@@ -1,8 +1,8 @@
-const { MAX_HISTORY_MESSAGES } = require('./config');
+
 
 const conversationHistories = new Map(); // canalId => [{author, content, timestamp, role}]
 
-function agregarMensajeHistorial(canalId, author, role, content) {
+function agregarMensajeHistorial(canalId, author, role, content, config) {
   if (!conversationHistories.has(canalId)) conversationHistories.set(canalId, []);
   const historial = conversationHistories.get(canalId);
   
@@ -14,8 +14,8 @@ function agregarMensajeHistorial(canalId, author, role, content) {
     role,
   });
 
-  if (historial.length > MAX_HISTORY_MESSAGES) {
-    conversationHistories.set(canalId, historial.slice(-MAX_HISTORY_MESSAGES));
+  if (historial.length > config.MAX_HISTORY_MESSAGES) {
+    conversationHistories.set(canalId, historial.slice(- config.MAX_HISTORY_MESSAGES));
   }
 }
 
@@ -25,7 +25,7 @@ function obtenerContextoParaCanal(canalId) {
   return historial
     .filter(m =>
       m.role === 'assistant' ||
-      m.content.toLowerCase().includes('vigo') ||
+      m.content.toLowerCase().includes(`${process.env.PERSONALITY_NAME}`) ||
       m.role === 'user'
     )
     .slice(-30)

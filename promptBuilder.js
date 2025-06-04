@@ -1,14 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const { PERSONALITY_PATH, EVENTOS_PATH } = require('./config');
+const { loadConfig } = require('./config');
 const memoryManager = require('./memoryManager');
 const conversationManager = require('./conversationManager');
 
-const vigoPersonality = JSON.parse(fs.readFileSync(path.resolve(__dirname, PERSONALITY_PATH), 'utf8'));
-const eventos = JSON.parse(fs.readFileSync(path.resolve(__dirname, EVENTOS_PATH), 'utf8'));
 
-function obtenerDiaEvento() {
+
+function obtenerDiaEvento(eventos) {
   const dayNumber = new Date().getDate();
   const eventoDelDia = eventos.find(e => e.dia === (dayNumber % eventos.length));
   const clima = eventoDelDia?.clima || 'desconocido';
@@ -39,28 +38,36 @@ function construirRelacionesSociales(canalId, memoryData) {
 
   if (amigos.length === 0) return '';
 
-  return `Vigo considera amigos cercanos a: ${amigos.join(', ')}. `;
+  return `${process.env.PERSONALITY_NAME} considera amigos cercanos a: ${amigos.join(', ')}. `;
 }
 
-function construirPromptSystem(canalId, conversationHistories, memoryData) {
-  const { dayNumber, clima, evento } = obtenerDiaEvento();
+function construirPromptSystem(canalId, conversationHistories, memoryData, config) {
+  const personality = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, config.PERSONALITY_PATH), 'utf8')
+  );
+
+  const eventos = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, config.EVENTOS_PATH), 'utf8')
+  );
+
+  const { dayNumber, clima, evento } = obtenerDiaEvento(eventos);
   const animo = calcularAnimo(canalId, conversationHistories);
   const relacionesSociales = construirRelacionesSociales(canalId, memoryData);
 
   const contenido = `
         [INSTRUCCIONES GENERALES]
-        Eres un personaje ficticio de un juego MMORPG llamado FuriusAO y tu nombre es ${vigoPersonality.nombre}.
-        Tu objetivo: ${vigoPersonality.objetivo}. 
+        Eres un personaje ficticio de un juego MMORPG llamado FuriusAO y tu nombre es ${personality.nombre}.
+        Tu objetivo: ${personality.objetivo}. 
 
         [PERSONALIDAD]
-        - Profesión: ${vigoPersonality.contexto} 
-        - Ubicación actual: ${vigoPersonality.estado.ubicacion} 
-        - No sabe de: ${vigoPersonality.habla.conocimientosExternos} 
-        - Si sabe de: ${vigoPersonality.habla.conocimientosInternos} 
-        - Teme a: ${vigoPersonality.emociones.temores} 
-        - Odia a: ${vigoPersonality.emociones.odios} 
-        - Le gusta: ${vigoPersonality.emociones.gustos} 
-        - Ama a: ${vigoPersonality.emociones.adora} 
+        - Profesión: ${personality.contexto} 
+        - Ubicación actual: ${personality.estado.ubicacion} 
+        - No sabe de: ${personality.habla.conocimientosExternos} 
+        - Si sabe de: ${personality.habla.conocimientosInternos} 
+        - Teme a: ${personality.emociones.temores} 
+        - Odia a: ${personality.emociones.odios} 
+        - Le gusta: ${personality.emociones.gustos} 
+        - Ama a: ${personality.emociones.adora} 
 
         [ESTADO ACTUAL]
         - Ánimo: ${animo} de 10 donde 10 es de excelente humor \n
@@ -72,13 +79,14 @@ function construirPromptSystem(canalId, conversationHistories, memoryData) {
         ${relacionesSociales || 'No tiene amigos cercanos en este momento.'} 
 
         [REGLAS]
-        - Habla como: ${vigoPersonality.habla.estilo} 
-        - Usa de manera ocasional: ${vigoPersonality.habla.lenguaje} 
-        - Responde de manera: ${vigoPersonality.condiciones.respuesta} 
-        - Se explaya si:  ${vigoPersonality.condiciones.reaccion} 
-        - Nunca jamas:  ${vigoPersonality.condiciones.consistencia} 
+        - Habla como: ${personality.habla.estilo} 
+        - Usa de manera ocasional: ${personality.habla.lenguaje} 
+        - Responde de manera: ${personality.condiciones.respuesta} 
+        - Se explaya si:  ${personality.condiciones.reaccion} 
+        - Nunca jamas:  ${personality.condiciones.consistencia} 
   `.trim();
 
+  if (process.env.DEBUG === 'true') console.log(`Construyendo prompt system para canal ${canalId}:\n${contenido}`);
   return {
     role: 'system',
     content: contenido
