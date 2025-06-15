@@ -2,27 +2,93 @@
   "ciudades": [
     {
       "nombre": "Ullathorpe",
-      "descripcion": "Una ciudad neutral al sur de Banderbill. Conectada por rutas comerciales, es un centro de intercambio cultural y económico."
+      "descripcion": "Una ciudad neutral al sur de Banderbill. Paso obligado de nobles, guerreros, criminales y comerciantes. Centro cultural y económico del continente."
     },
     {
       "nombre": "Nix",
-      "descripcion": "Ciudad fiel a Banderbill al sur de Ullathorpe, famosa por sus pescadores y naturaleza tranquila. Es un lugar de descanso y reflexión para los viajeros."
+      "descripcion": "Ciudad fiel a Banderbill, al sur de Ullathorpe. Destaca por su tranquila pesca, belleza natural y reciente expansión, siendo la segunda más grande del continente."
     },
     {
       "nombre": "Arghal",
-      "descripcion": "Ciudad al oeste de Banderbill, hogar de Lord Theck y sus seguidores. Esta emplazada en medio de un desierto árido y es conocida por su cultura guerrera y sus tradiciones marciales."
+      "descripcion": "Totalmente destruida por guerras y rodeada por desierto. Sus habitantes rindieron homenaje a Lord Theck. Hogar de criminales y asesinos en las Tierras de FúriusAO."
     },
     {
       "nombre": "Nueva Esperanza",
-      "descripcion": "Una ciudad en una isla en medio del oceano. Es un lugar magico y lleno de misterios, donde los viajeros buscan aventuras y tesoros ocultos."
+      "descripcion": "Ciudad isleña mágica creada por comerciantes y aventureros exiliados. Es independiente de facciones y repleta de misterios y tesoros."
+    },
+    {
+      "nombre": "Dungeon Marabel",
+      "descripcion": "Dungeon cercano a Banderbill, ideal para guerreros novatos que buscan nivelarse tras los bosques."
+    },
+    {
+      "nombre": "Pantanos",
+      "descripcion": "Región pantanosa al sur de Ullathorpe, nacida de un bosque pudrido. Es inhóspita, peligrosa, pero rica en recursos."
+    },
+    {
+      "nombre": "Hillidian",
+      "descripcion": "Desierto nevado donde la magia está anulada. Lugar de entrenamiento para quienes no usan magia."
+    },
+    {
+      "nombre": "Banderbill",
+      "descripcion": "La ciudad capital de la Alianza Fúrius, sede del Palacio Real y del Gran Consejo. Fortificada y protegida por elite militar."
+    },
+    {
+      "nombre": "Dungeon Newbie",
+      "descripcion": "Dungeon seguro para iniciarse en el combate. Alberga NPC débiles para aprender."
+    },
+    {
+      "nombre": "Catacumbas",
+      "descripcion": "Túneles subterráneos llenos de arañas gigantes que conectan Ullathorpe y Nix."
+    },
+    {
+      "nombre": "Dungeon Atávico",
+      "descripcion": "Ruptura en la tierra cercana a Ullathorpe. Aventureros pueden explorarla si son lo suficientemente fuertes."
+    },
+    {
+      "nombre": "Cementerio",
+      "descripcion": "Antiguo cementerio de Fúrius, ahora hogar de fantasmas. Guerreros pierden la cordura allí."
+    },
+    {
+      "nombre": "Pirámide",
+      "descripcion": "En el desierto de Arghal. Momias vivientes protegen tesoros ancestrales."
+    },
+    {
+      "nombre": "Dungeon Veril",
+      "descripcion": "Dungeon avanzado para guerreros sigilosos y fuertes, lleno de grandes monstruos."
+    },
+    {
+      "nombre": "Dungeon Fúrius",
+      "descripcion": "También llamado Templo Ancestral. Alberga criaturas poderosas y grandes recompensas."
+    },
+    {
+      "nombre": "Cavernas Heladas",
+      "descripcion": "Cavernas gélidas cerca de Hillidian. Solo guerreros no mágicos sobreviven ahí."
+    },
+    {
+      "nombre": "Castillo Ananke",
+      "descripcion": "Dungeon donde reside un rey trastornado por la magia oscura. Su acólito guarda la gema del clan."
+    },
+    {
+      "nombre": "Castillo iLermus",
+      "descripcion": "Castillo del hermano del Rey Ananke, quien planea traicionarlo y asumir el poder."
+    },
+    {
+      "nombre": "Ultratumba",
+      "descripcion": "Dungeon de conexión entre Veril y el Templo Ancestral. Solo apto para los guerreros más poderosos."
     }
   ],
   "historia": [
     "Hace 200 años, el Trono de Banderbill fue arrebatado por el linaje de Theoden tras la caída del Consejo de las Cuatro Espadas.",
-    "Durante la Guerra del Eclipse, Banderbill resistió un asedio de 93 días liderado por los clanes del norte."
+    "Durante la Guerra del Eclipse, Banderbill resistió un asedio de 93 días liderado por los clanes del norte.",
+    "Antes de la llegada de Theoden, Ullathorpe sirvió como punto de negociación entre facciones durante la Gran Peste del Norte.",
+    "Hace 50 años se firmó el Tratado de Ullathorpe, asegurando la neutralidad comercial de esa ciudad por diez generaciones.",
+    "Hace 10 años, el Filósofo Errante creó las Cápsulas de Sabiduría en el Templo del Viento para preservar el conocimiento ancestral."
   ],
   "culturas": [
     "Los habitantes de Banderbill celebran la Noche del Cuervo cada solsticio en honor a los sabios caídos.",
-    "En Norvarn, las bodas se realizan durante los eclipses lunares, simbolizando la unión del destino y el misterio."
+    "Cada año en Nix se celebra la Fiesta de la Pescadora, donde se bendice la red para asegurar buenas capturas.",
+    "En Arghal se practica el Torneo del Desierto, donde guerreros prueban su fuerza caminando sobre arenas incandescentes.",
+    "En Hillidian se practica el rito del Silencio de Hielo, donde los jóvenes luchadores prueban su fortaleza contra el frío.",
+    "Cada diez años, Isla Esperanza realiza el Festival de las Llamas, una ceremonia de purificación interfacial para aventureros."
   ]
 }

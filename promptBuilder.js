@@ -82,6 +82,9 @@ async function construirPromptSystem(canalId, conversationHistories, memoryData,
         [RELACIONES]
         ${relacionesSociales || 'No tiene amigos cercanos en este momento.'} 
 
+        [CONOCIMIENTO DEL MUNDO]
+        ${conocimientoMundo || 'No tiene conocimiento relevante sobre la pregunta que hicieron.'}
+
         [REGLAS]
         - Habla como: ${personality.habla.estilo} 
         - Usa de manera ocasional: ${personality.habla.lenguaje} 
