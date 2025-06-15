@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const { loadConfig } = require('./config');
 const memoryManager = require('./memoryManager');
 const conversationManager = require('./conversationManager');
 
