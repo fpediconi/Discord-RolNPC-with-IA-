@@ -4,7 +4,6 @@ const config = new Config();
 
 const express = require('express');
 const memoryManager = require('./memoryManager');
-memoryManager.cargarMemoria(config);
 const conversationManager = require('./conversationManager');
 const filter = require('./filter');
 const promptBuilder = require('./promptBuilder');
@@ -116,9 +115,10 @@ async function procesarMensajesAgrupados(canalId) {
   }
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log(`Bot listo! Conectado como ${client.user.tag}`);
-  config.cargar();
+  await config.cargar();
+  memoryManager.cargarMemoria(config);
 });
 
 client.login(process.env.DISCORD_TOKEN);

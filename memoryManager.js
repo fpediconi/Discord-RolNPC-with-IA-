@@ -4,7 +4,7 @@ let memoryData = {};
 
 function cargarMemoria(config) {
   try {
-    if (fs.existsSync(MEMORY_PATH)) {
+    if (fs.existsSync(config.MEMORY_PATH)) {
       memoryData = JSON.parse(fs.readFileSync(config.MEMORY_PATH, 'utf8'));
     }
   } catch {
