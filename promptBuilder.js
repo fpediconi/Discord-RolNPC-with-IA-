@@ -51,6 +51,18 @@ function construirPromptSystem(canalId, conversationHistories, memoryData, confi
   );
 
   const { dayNumber, clima, evento } = obtenerDiaEvento(eventos);
+
+  const lore = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, 'data/lore.json'), 'utf8')
+  );
+
+  let fragmentos = [];
+  if (lore.ciudades) fragmentos.push(...lore.ciudades.map(c => `${c.nombre}: ${c.descripcion}`));
+  if (lore.historia) fragmentos.push(...lore.historia);
+  if (lore.culturas) fragmentos.push(...lore.culturas);
+
+  const conocimientoMundo = `Conocimiento del mundo de Banderbill:\n- ${fragmentos.slice(0, 10).join('\n- ')}\n\n`;
+
   const animo = calcularAnimo(canalId, conversationHistories);
   const relacionesSociales = construirRelacionesSociales(canalId, memoryData);
 

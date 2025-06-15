@@ -13,7 +13,7 @@ function hayDialogoRecienteConUsuario(message, historial) {
     const esBot = anterior.role === 'assistant';
     if (process.env.DEBUG === 'true') console.log(`[DEBUG] Revisando mensaje: ${actual.content} (Usuario: ${esUsuario}, Bot: ${esBot})`);
     
-    if (esUsuario && esBot && now - anterior.timestamp < 1000 * 15) {
+    if (esUsuario && esBot && now - anterior.timestamp < 5000 * 15) {
       return true;
     }
   }

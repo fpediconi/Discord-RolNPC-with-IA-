@@ -3,7 +3,7 @@ const axios = require('axios');
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
 const MODEL_NAME = 'llama3';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = 'openai/gpt-3.5-turbo';
+const OPENROUTER_MODEL = 'meta-llama/llama-3-8b-instruct';
 
 let consultasEnProceso = 0;
 const colaConsultas = [];
@@ -58,7 +58,7 @@ async function procesarConsultaIAInt(messages, config) {
 }
 
 async function procesarConsultaIAExt(messages, config) {
-  console.log('Api de open router: ', config.OPENROUTER_API_KEY, ' registrada');
+  console.log('API de OpenRouter registrada con key: ', config.OPENROUTER_API_KEY);
   
   return new Promise((resolve) => {
     const ejecutar = async () => {
@@ -67,10 +67,14 @@ async function procesarConsultaIAExt(messages, config) {
         const res = await axios.post(
           OPENROUTER_URL,
           {
-            model: OPENROUTER_MODEL,
+            model: OPENROUTER_MODEL, // lo podés setear como 'meta-llama/llama-3-8b-instruct'
             messages,
-            temperature: 0.8,
-            stream: false,
+            temperature: 0.85,
+            top_p: 0.9,
+            presence_penalty: 0.6,
+            frequency_penalty: 0.3,
+            max_tokens: 500,
+            stream: false
           },
           {
             headers: {
@@ -99,5 +103,6 @@ async function procesarConsultaIAExt(messages, config) {
     }
   });
 }
+
 
 module.exports = { procesarConsultaIA, procesarConsultaIAExt };
