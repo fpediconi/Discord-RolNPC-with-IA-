@@ -58,7 +58,9 @@ async function procesarConsultaIAInt(messages, config) {
 }
 
 async function procesarConsultaIAExt(messages, config) {
-  console.log('API de OpenRouter registrada con key: ', config.OPENROUTER_API_KEY);
+  if (process.env.DEBUG === 'true') {
+    console.log('API de OpenRouter key loaded');
+  }
   
   return new Promise((resolve) => {
     const ejecutar = async () => {
