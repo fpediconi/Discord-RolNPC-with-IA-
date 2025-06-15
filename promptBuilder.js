@@ -3,6 +3,7 @@ const path = require('path');
 
 const memoryManager = require('./memoryManager');
 const conversationManager = require('./conversationManager');
+const { findRelevantLore } = require('./loreIndexer');
 
 
 
@@ -40,7 +41,7 @@ function construirRelacionesSociales(canalId, memoryData) {
   return `${process.env.PERSONALITY_NAME} considera amigos cercanos a: ${amigos.join(', ')}. `;
 }
 
-function construirPromptSystem(canalId, conversationHistories, memoryData, config) {
+async function construirPromptSystem(canalId, conversationHistories, memoryData, config, query) {
   const personality = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, config.PERSONALITY_PATH), 'utf8')
   );
@@ -51,16 +52,8 @@ function construirPromptSystem(canalId, conversationHistories, memoryData, confi
 
   const { dayNumber, clima, evento } = obtenerDiaEvento(eventos);
 
-  const lore = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, 'data/lore.json'), 'utf8')
-  );
-
-  let fragmentos = [];
-  if (lore.ciudades) fragmentos.push(...lore.ciudades.map(c => `${c.nombre}: ${c.descripcion}`));
-  if (lore.historia) fragmentos.push(...lore.historia);
-  if (lore.culturas) fragmentos.push(...lore.culturas);
-
-  const conocimientoMundo = `Conocimiento del mundo de Banderbill:\n- ${fragmentos.slice(0, 10).join('\n- ')}\n\n`;
+  const fragmentos = await findRelevantLore(query || '', 10);
+  const conocimientoMundo = `Conocimiento del mundo de Banderbill:\n- ${fragmentos.join('\n- ')}\n\n`;
 
   const animo = calcularAnimo(canalId, conversationHistories);
   const relacionesSociales = construirRelacionesSociales(canalId, memoryData);

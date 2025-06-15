@@ -91,11 +91,12 @@ async function procesarMensajesAgrupados(canalId) {
   memoryManager.actualizarMemoriaUsuario(canalId, user, mensajesAgrupados, config);
   conversationManager.agregarMensajeHistorial(canalId, user, 'user', mensajesAgrupados, config);
 
-  const systemPrompt = promptBuilder.construirPromptSystem(
+  const systemPrompt = await promptBuilder.construirPromptSystem(
     canalId,
     conversationManager.conversationHistories,
     memoryManager.memoryData,
-    config
+    config,
+    mensajesAgrupados
   );
 
   const contextoGrupo = conversationManager.obtenerContextoParaCanal(canalId);

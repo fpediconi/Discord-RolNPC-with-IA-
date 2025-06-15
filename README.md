@@ -92,5 +92,15 @@ El archivo vigoPersonality.json contiene la estructura para poder editar esta pr
         PORT=8000 (solo util para ejecutar como web aplication en render.)
 
 7. Ejecuta:
-   
+
         node index.js
+
+## Actualizar embeddings de lore
+
+Si modificás `data/lore.json`, corré el indexador para regenerar las embeddings almacenadas:
+
+```
+node loreIndexer.js
+```
+
+Esto creará/actualizará `data/runtime/lore.db` con los textos y sus embeddings.
