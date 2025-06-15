@@ -15,7 +15,7 @@ const AGRUPACION_DELAY_MS = 3000;
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => res.send(proces`${process.env.PERSONALITY_NAME} está despierto.`));
+app.get('/', (req, res) => res.send(`${process.env.PERSONALITY_NAME} está despierto.`));
 app.listen(PORT, () => console.log(`Servidor web falso activo en puerto ${PORT}`));
 
 const client = new Client({
