@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const memoryManager = require('./memoryManager');
-const conversationManager = require('./conversationManager');
-const { findRelevantLore } = require('./loreIndexer');
+const memoryManager = require('../conversation/memoryManager');
+const conversationManager = require('../conversation/conversationManager');
+const { findRelevantLore } = require('../conversation/loreIndexer');
 
 
 

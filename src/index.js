@@ -3,11 +3,11 @@ const Config = require('./config');
 const config = new Config();
 
 const express = require('express');
-const memoryManager = require('./memoryManager');
-const conversationManager = require('./conversationManager');
-const filter = require('./filter');
-const promptBuilder = require('./promptBuilder');
-const iaClient = require('./iaClient');
+const memoryManager = require('./conversation/memoryManager');
+const conversationManager = require('./conversation/conversationManager');
+const filter = require('./conversation/filter');
+const promptBuilder = require('./iaClient/promptBuilder');
+const iaClient = require('./iaClient/iaClient');
 
 const mensajeBuffer = {};
 const AGRUPACION_DELAY_MS = 3000;
